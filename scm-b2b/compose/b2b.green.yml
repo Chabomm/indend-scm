@@ -1,0 +1,20 @@
+version: '3'
+services:
+    b2b:
+        image: b2b
+        container_name: b2b-green
+        env_file: ../.env.production
+        build:
+            context: ../
+        restart: always
+        environment:
+            - PORT=13002
+        ports:
+            - 13002:13002
+        volumes:
+            - ../../resource:/app/public/resource
+        networks:
+            - common
+networks:
+    common:
+        external: true

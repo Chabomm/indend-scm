@@ -1,0 +1,88 @@
+version: "3"
+services:
+    scm-database:
+        restart: always
+        image: scm-database
+        container_name: scm-database
+        build: ./scm-database
+        ports:
+            - '33306:3306'
+        volumes:
+            - ./data/mysql:/var/lib/mysql
+        env_file: .env
+        environment:
+            - TZ=Asia/Seoul
+        networks:
+            - common
+
+    scm-backend:
+        image: scm-backend
+        container_name: scm-backend
+        build: ./scm-backend
+        restart: always
+        volumes:
+            - ./data/:/usr/src/app/data/
+            - ./resource/:/usr/src/app/resource/
+            - ./scm-backend:/usr/src/app
+        ports:
+            - "5300:5300"
+        env_file: .env
+        environment:
+            - PROFILE=development
+            - HOST=http://localhost:5300
+            - MYSQL_HOST=scm-database
+        networks:
+            - common
+
+    scm-b2b:
+        image: scm-b2b
+        container_name: scm-b2b
+        build:
+            context: ./scm-b2b
+            target: dev
+        restart: always
+        command: yarn dev
+        volumes:
+            - ./scm-b2b:/app
+            - ./resource/:/app/public/resource
+            - /app/node_modules
+            - /app/.next
+        ports:
+            - '13000:13000'
+        environment:
+            - PORT=13000
+            - NODE_ENV=development
+            - NEXT_PUBLIC_HOST=http://localhost:13000
+            - NEXT_PUBLIC_BACKEND=http://scm-backend:5300
+            - NEXT_PUBLIC_TOKENNAME=SCM-B2B
+            - NEXT_PUBLIC_UMS=http://
+        networks:
+            - common
+
+    scm-entry:
+        image: scm-entry
+        container_name: scm-entry
+        build:
+            context: ./scm-entry
+            target: dev
+        restart: always
+        command: yarn dev
+        volumes:
+            - ./scm-entry:/app
+            - ./resource/:/app/public/resource
+            - /app/node_modules
+            - /app/.next
+        ports:
+            - '13020:13020'
+        environment:
+            - PORT=13020
+            - NODE_ENV=development
+            - NEXT_PUBLIC_HOST=http://localhost:13020
+            - NEXT_PUBLIC_BACKEND=http://scm-backend:5300
+            - NEXT_PUBLIC_TOKENNAME=SCM-ENTRY
+        networks:
+            - common
+
+networks:
+    common:
+        external: true

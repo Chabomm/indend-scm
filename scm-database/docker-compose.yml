@@ -1,0 +1,20 @@
+version: '3'
+services:
+    database:
+        image: database
+        container_name: database
+        build: ./
+        restart: always
+        ports:
+            - '3306:3306'
+        volumes:
+            - ./conf/my.cnf:/etc/my.cnf
+            - ../data/mysql:/var/lib/mysql
+        env_file: ../.env
+        environment:
+            - TZ=Asia/Seoul
+        networks:
+            - common
+networks:
+    common:
+        external: true

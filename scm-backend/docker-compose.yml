@@ -1,0 +1,25 @@
+version: '3'
+services:
+    backend:
+        image: backend
+        build: ./
+        container_name: backend
+        restart: always
+        volumes:
+            - ./:/usr/src/app
+            - ../data/:/usr/src/app/data/
+            - ../resource/:/usr/src/app/resource/
+        ports:
+            - '5300:5300'
+        env_file: ../.env
+        environment:
+            - PROFILE=production
+            - HOST=http://
+            - HOST_IP=
+            - UMS_URL=http://
+
+        networks:
+            - common
+networks:
+    common:
+        external: true
